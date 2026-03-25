@@ -1,0 +1,2 @@
+# Static Assets
+This folder contains static assets for the application.
