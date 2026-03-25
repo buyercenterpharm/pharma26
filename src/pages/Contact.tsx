@@ -23,33 +23,64 @@ export default function Contact() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24">
           <div>
             <h2 className="text-3xl font-bold mb-8 text-brand-blue">Inquiry Form</h2>
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <form 
+              action="https://formspree.io/f/xqegzjoz" 
+              method="POST"
+              className="space-y-6"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">Full Name</label>
-                  <input type="text" className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors" placeholder="John Doe" />
+                  <input 
+                    name="name"
+                    type="text" 
+                    required
+                    className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors" 
+                    placeholder="John Doe" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">Company Name</label>
-                  <input type="text" className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors" placeholder="Enterprise Ltd" />
+                  <input 
+                    name="company"
+                    type="text" 
+                    required
+                    className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors" 
+                    placeholder="Enterprise Ltd" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">Business Email</label>
-                <input type="email" className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors" placeholder="contact@company.com" />
+                <input 
+                  name="email"
+                  type="email" 
+                  required
+                  className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors" 
+                  placeholder="contact@company.com" 
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">Subject</label>
-                <select className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors bg-transparent">
-                  <option>Wholesale Inquiry</option>
-                  <option>Sourcing Request</option>
-                  <option>Logistics & Distribution</option>
-                  <option>Other Professional Inquiry</option>
+                <select 
+                  name="subject"
+                  className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors bg-transparent"
+                >
+                  <option value="Wholesale Inquiry">Wholesale Inquiry</option>
+                  <option value="Sourcing Request">Sourcing Request</option>
+                  <option value="Logistics & Distribution">Logistics & Distribution</option>
+                  <option value="Other Professional Inquiry">Other Professional Inquiry</option>
                 </select>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">Message</label>
-                <textarea rows={4} className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors resize-none" placeholder="How can we assist your business?"></textarea>
+                <textarea 
+                  name="message"
+                  rows={4} 
+                  required
+                  className="w-full border-b border-brand-grey py-3 focus:outline-none focus:border-brand-blue transition-colors resize-none" 
+                  placeholder="How can we assist your business?"
+                ></textarea>
               </div>
               <button type="submit" className="btn-primary w-full md:w-auto">SEND INQUIRY</button>
             </form>
