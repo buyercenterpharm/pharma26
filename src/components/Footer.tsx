@@ -42,7 +42,7 @@ export default function Footer() {
             PHARMA26 LTD<br />
             Cyprus<br />
             Registration: HE 123456 (Placeholder)<br />
-            Email: buyercenterpharm@gmail.com
+            Email: buyer@pharma26.com
           </p>
         </div>
       </div>
