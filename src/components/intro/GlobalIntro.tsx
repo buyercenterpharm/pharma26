@@ -1,83 +1,152 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
 import './intro.css';
 
-const SESSION_KEY='pharma26.global-intro.v1';
-// No query-string bypass or production replay flag: session behavior is consistent.
+const SESSION_KEY = 'pharma26.global-intro.v1';
+const LOGO_START = 7;
+const LOGO_REVEAL_DURATION = .9;
+type Phase = 'preparing' | 'playing' | 'fallback' | 'exiting' | 'done';
+
 export default function GlobalIntro() {
-  const { pathname }=useLocation();
-  const [phase,setPhase]=useState<'preparing'|'playing'|'done'>('preparing');
-  const [compact,setCompact]=useState(false);
-  const host=useRef<HTMLDivElement>(null);
-  const skip=useRef<HTMLButtonElement>(null);
-  const finishRef=useRef<()=>void>(()=>{});
-  useEffect(()=>{
-    if(pathname!=='/'){setPhase('done');return;}
-    const media=window.matchMedia('(prefers-reduced-motion: reduce)');
-    try { if(media.matches || sessionStorage.getItem(SESSION_KEY)){setPhase('done');return;} }
-    catch {setPhase('done');return;} // Restricted storage must never cause repeated interruptions.
-    const nav=navigator as Navigator & {deviceMemory?:number;connection?:{saveData?:boolean}};
-    if(nav.connection?.saveData){setPhase('done');return;}
-    const mobile=window.matchMedia('(max-width: 767px)').matches || (nav.deviceMemory!==undefined && nav.deviceMemory<=2) || navigator.hardwareConcurrency<=2;
-    setCompact(mobile);setPhase('preparing');
-    const abort=new AbortController();
-    let ended=false,playing=false,cleanupScene=()=>{};
-    let endTimer:ReturnType<typeof setTimeout>;
-    const mark=()=>{try{sessionStorage.setItem(SESSION_KEY,'seen');}catch{/* No storage dependency for dismissal. */}};
-    const finish=()=>{if(ended)return;ended=true;mark();clearTimeout(endTimer);clearTimeout(loadTimer);abort.abort();cleanupScene();setPhase('done');};
-    finishRef.current=finish;
-    // While preparation happens, the homepage remains fully interactive. User intent cancels the intro.
-    const interaction=()=>{if(!playing)finish();};
-    const visibility=()=>{if(document.hidden)finish();};
-    const preference=()=>{if(media.matches)finish();};
-    window.addEventListener('pointerdown',interaction);window.addEventListener('keydown',interaction);window.addEventListener('wheel',interaction,{passive:true});
-    document.addEventListener('visibilitychange',visibility);media.addEventListener('change',preference);
-    const loadTimer=setTimeout(finish,1800);
-    const start=()=>{if(ended)return;clearTimeout(loadTimer);playing=true;mark();setPhase('playing');endTimer=setTimeout(finish,mobile?1800:6000);};
-    const loadLogo=(src:string)=>{const image=new Image();image.src=src;return image.decode();};
-    Promise.all([loadLogo('/favicon.png'),loadLogo('/logo.png')]).then(async()=>{
-      if(ended)return;
-      if(mobile){start();return;}
-      const {createGlobeScene}=await import('./globeScene');
-      if(ended||!host.current)return;
-      const scene=await createGlobeScene(host.current,abort.signal,finish);
-      cleanupScene=scene.dispose;
-      if(ended){scene.dispose();return;}
-      start();scene.start();
+  const { pathname } = useLocation();
+  const [phase, setPhase] = useState<Phase>('preparing');
+  const [fallback, setFallback] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const skip = useRef<HTMLButtonElement>(null);
+  const finishRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    if (pathname !== '/') { setPhase('done'); return; }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    try {
+      if (reduced.matches || sessionStorage.getItem(SESSION_KEY)) { setPhase('done'); return; }
+    } catch { setPhase('done'); return; }
+    const video = videoRef.current;
+    if (!video) return;
+    let disposed = false, shown = false, exiting = false, staticMode = false, logoReady = false;
+    let frame = 0, videoFrame = 0;
+    let prepareTimer: ReturnType<typeof setTimeout>;
+    let finishTimer: ReturnType<typeof setTimeout>;
+    let stallTimer: ReturnType<typeof setTimeout>;
+    let safetyTimer: ReturnType<typeof setTimeout>;
+    const markSeen = () => { try { sessionStorage.setItem(SESSION_KEY, 'seen'); } catch { /* optional storage */ } };
+    const stopFrames = () => {
+      cancelAnimationFrame(frame);
+      if ('cancelVideoFrameCallback' in video) video.cancelVideoFrameCallback(videoFrame);
+    };
+    const clearTimers = () => { clearTimeout(prepareTimer); clearTimeout(finishTimer); clearTimeout(stallTimer); clearTimeout(safetyTimer); };
+    const finish = () => {
+      if (disposed) return;
+      disposed = true; clearTimers(); stopFrames(); video.pause();
+      video.removeAttribute('src'); video.load(); markSeen(); setPhase('done');
+    };
+    finishRef.current = finish;
+    const exit = () => {
+      if (disposed || exiting) return;
+      exiting = true; clearTimers(); stopFrames(); video.pause(); setPhase('exiting');
+      finishTimer = setTimeout(finish, 550);
+    };
+    const showFallback = () => {
+      if (disposed || exiting || staticMode) return;
+      clearTimers(); stopFrames(); video.pause();
+      if (!logoReady) { finish(); return; }
+      staticMode = true; shown = true; video.removeAttribute('src'); video.load();
+      markSeen(); setFallback(true); setPhase('fallback');
+      if (logoRef.current) { logoRef.current.style.opacity = '1'; logoRef.current.style.transform = 'scale(1)'; }
+      finishTimer = setTimeout(exit, 1500);
+    };
+    // The actual decoded video time controls the logo, including after buffering or seeking.
+    const syncLogo = (time: number) => {
+      if (disposed || staticMode || !logoRef.current) return;
+      const progress = Math.max(0, Math.min(1, (time - LOGO_START) / LOGO_REVEAL_DURATION));
+      const eased = progress * progress * (3 - 2 * progress);
+      logoRef.current.style.opacity = String(eased);
+      logoRef.current.style.transform = `scale(${.96 + .04 * eased})`;
+    };
+    const trackFrame = () => {
+      if (disposed || exiting || staticMode) return;
+      if ('requestVideoFrameCallback' in video) {
+        videoFrame = video.requestVideoFrameCallback((_now, metadata) => { syncLogo(metadata.mediaTime); trackFrame(); });
+      } else {
+        frame = requestAnimationFrame(() => { syncLogo(video.currentTime); trackFrame(); });
+      }
+    };
+    const onPlaying = () => {
+      if (disposed || exiting || staticMode) { video.pause(); return; }
+      clearTimeout(stallTimer);
+      if (!shown) {
+        shown = true; clearTimeout(prepareTimer); markSeen(); setPhase('playing'); trackFrame();
+        safetyTimer = setTimeout(showFallback, 16000);
+      }
+    };
+    const onWaiting = () => {
+      if (!disposed && shown && !staticMode && !exiting) { clearTimeout(stallTimer); stallTimer = setTimeout(showFallback, 2000); }
+    };
+    const onTime = () => syncLogo(video.currentTime);
+    const onEnded = () => { syncLogo(video.duration); exit(); };
+    const userIntent = () => { if (!shown) finish(); };
+    const onVisibility = () => { if (document.hidden) finish(); };
+    const onPreference = () => { if (reduced.matches) finish(); };
+    window.addEventListener('pointerdown', userIntent);
+    window.addEventListener('keydown', userIntent);
+    window.addEventListener('wheel', userIntent, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
+    reduced.addEventListener('change', onPreference);
+    video.addEventListener('playing', onPlaying);
+    video.addEventListener('waiting', onWaiting);
+    video.addEventListener('error', showFallback);
+    video.addEventListener('ended', onEnded);
+    video.addEventListener('timeupdate', onTime);
+    prepareTimer = setTimeout(showFallback, 2500);
+    const logo = new Image(); logo.src = '/logo.png';
+    logo.decode().then(() => {
+      if (disposed) return;
+      logoReady = true;
+      const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+      if (connection?.saveData) { showFallback(); return; }
+      video.muted = true; video.defaultMuted = true; video.playsInline = true;
+      video.src = '/video/global-connections.mp4'; video.preload = 'auto';
+      video.play().catch(showFallback);
     }).catch(finish);
-    return ()=>{
-      ended=true;clearTimeout(loadTimer);clearTimeout(endTimer);abort.abort();cleanupScene();
-      window.removeEventListener('pointerdown',interaction);window.removeEventListener('keydown',interaction);window.removeEventListener('wheel',interaction);
-      document.removeEventListener('visibilitychange',visibility);media.removeEventListener('change',preference);
+    return () => {
+      disposed = true; clearTimers(); stopFrames();
+      video.removeEventListener('playing', onPlaying); video.removeEventListener('waiting', onWaiting);
+      video.removeEventListener('error', showFallback); video.removeEventListener('ended', onEnded); video.removeEventListener('timeupdate', onTime);
+      video.pause(); video.removeAttribute('src'); video.load();
+      window.removeEventListener('pointerdown', userIntent); window.removeEventListener('keydown', userIntent); window.removeEventListener('wheel', userIntent);
+      document.removeEventListener('visibilitychange', onVisibility); reduced.removeEventListener('change', onPreference);
     };
-  },[pathname]);
-  useEffect(()=>{
-    if(phase!=='playing')return;
-    const site=document.getElementById('site-content');
-    const focusBefore=document.activeElement as HTMLElement|null;
-    const overflow=document.body.style.overflow;
-    const wasInert=site?.inert??false;
-    if(site)site.inert=true;
-    document.body.style.overflow='hidden';skip.current?.focus({preventScroll:true});
-    const keyboard=(event:KeyboardEvent)=>{
-      if(event.key==='Escape'){event.preventDefault();finishRef.current();}
-      if(event.key==='Tab'){event.preventDefault();skip.current?.focus();}
+  }, [pathname]);
+
+  const visible = phase === 'playing' || phase === 'fallback' || phase === 'exiting';
+  useEffect(() => {
+    if (!visible) return;
+    const site = document.getElementById('site-content');
+    const before = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow, wasInert = site?.inert ?? false;
+    if (site) site.inert = true;
+    document.body.style.overflow = 'hidden'; skip.current?.focus({ preventScroll: true });
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); finishRef.current(); }
+      if (event.key === 'Tab') { event.preventDefault(); skip.current?.focus(); }
     };
-    window.addEventListener('keydown',keyboard);
-    return ()=>{
-      if(site)site.inert=wasInert;document.body.style.overflow=overflow;
-      window.removeEventListener('keydown',keyboard);
-      if(focusBefore && focusBefore!==document.body && focusBefore.isConnected)focusBefore.focus({preventScroll:true});
-      else (document.querySelector('.premium-logo') as HTMLElement|null)?.focus({preventScroll:true});
+    window.addEventListener('keydown', keyboard);
+    return () => {
+      if (site) site.inert = wasInert;
+      document.body.style.overflow = overflow; window.removeEventListener('keydown', keyboard);
+      if (before && before !== document.body && before.isConnected) before.focus({ preventScroll: true });
+      else (document.querySelector('.premium-logo') as HTMLElement | null)?.focus({ preventScroll: true });
     };
-  },[phase]);
-  if(phase==='done'||pathname!=='/')return null;
-  return <div className={`global-intro ${phase==='playing'?'intro-playing':''} ${compact?'intro-compact':''}`} role={phase==='playing'?'dialog':undefined} aria-modal={phase==='playing'?true:undefined} aria-label="PHARMA26 introduction" aria-hidden={phase!=='playing'}>
-    <div className="intro-canvas" ref={host} aria-hidden="true" />
-    <div className="intro-vignette" aria-hidden="true" />
-    <div className="intro-top"><span>PHARMA26 LTD</span><span>INTERNATIONAL BEAUTY TRADE</span></div>
-    <div className="intro-editorial" aria-hidden="true"><p>GLOBAL CONNECTIONS</p><h2>A world of possibility.</h2><span>Beauty. Business. Beyond.</span></div>
-    <div className="intro-brand" aria-hidden="true"><div className="intro-ivory" /><div className="intro-monogram"><img src="/favicon.png" alt="" /></div><img className="intro-full-logo" src="/logo.png" alt="" /></div>
-    <div className="intro-bottom"><span>Symbolic connections · Not a service coverage map</span><button ref={skip} type="button" onClick={()=>finishRef.current()} tabIndex={phase==='playing'?0:-1}>Skip Intro <span aria-hidden="true">↗</span></button></div>
+  }, [visible]);
+
+  if (phase === 'done' || pathname !== '/') return null;
+  return <div className={`global-intro video-intro ${visible ? 'intro-visible' : ''} ${phase === 'exiting' ? 'intro-exiting' : ''} ${fallback ? 'intro-fallback' : ''}`} data-phase={phase} role={visible ? 'dialog' : undefined} aria-modal={visible ? true : undefined} aria-label="PHARMA26 introduction" aria-hidden={!visible}>
+    <div className="intro-film-frame">
+      <video ref={videoRef} muted playsInline preload="none" disablePictureInPicture aria-hidden="true" tabIndex={-1} />
+      <img ref={logoRef} className="intro-full-logo" src="/logo.png" alt="PHARMA26 LTD — Cosmetic Wholesale Trading" width="622" height="416" />
+    </div>
+    <div className="intro-bottom"><span>Global Connections · An illustrative brand film</span><button ref={skip} type="button" onClick={() => finishRef.current()} tabIndex={visible ? 0 : -1}>Skip Intro <ArrowUpRight size={16} aria-hidden="true" /></button></div>
   </div>;
 }

@@ -1,51 +1,41 @@
-# Global Connections — introduction prototype
+# Global Connections — supplied video integration
 
-## Scope and checkpoint
+Implemented on `redesign/premium-homepage`. The previous WebGL prototype remains recoverable in Git at `d380347`. Its scene module, map textures, generation script, Three.js and Three.js typings have been removed from the current implementation. The existing homepage, navigation, other routes, logo files and contact integration are unchanged.
 
-Implemented on `redesign/premium-homepage`. Checkpoint: `94642bc` (preceding homepage implementation: `0a0a1a7`). The existing homepage components, company content, navigation, and contact integration are unchanged. `src/App.tsx` mounts `GlobalIntro` alongside the original site wrapper. Removing that import/component disables the introduction without rebuilding the homepage. No production settings, deployment or domain changes.
+## Supplied media
 
-## Actual rendering
+`public/video/global-connections.mp4` is a byte-identical copy of the user-supplied `gemini_generated_video_cc80fe78.mp4`:
 
-Three.js 0.180.0 renders a real sphere mesh, land/bump textures, directional lighting, a rim-atmosphere shader, spatial connection paths, moving sprite particles, subtle globe rotation, and a camera push-in. Paths are revealed progressively; particle heads converge toward the camera-facing center. Hidden sides are depth-tested against the sphere.
+- H.264, 1280 × 720, 24 fps; approximately 10 seconds.
+- AAC audio track retained in the original asset, but browser playback is always muted.
+- 5,299,059 bytes; SHA-256 `9ebc94050684865f3f85e511f5d85e7fc39de649976c3f9beabdadbbcc024b51`.
+- No re-encoding, cropping, watermark removal, playback-speed adjustment, or quality reduction.
+- Provided by the user for this integration; generation tool provenance and commercial licensing were not independently audited. No new stock or paid assets are introduced.
 
-This is a **stylized metallic globe**, not a photoreal satellite Earth. Glow uses additive sprites and a rim shader, not physically simulated volumetric scattering. There is no optical depth-of-field pass. Globe-to-brand is a coordinated dissolve/ivory aperture and exact PNG overlays, not a topology morph into the monogram. The website does not play a pre-rendered video; review recordings show the live implementation.
+The full-screen dark stage contains the complete 16:9 frame using `object-fit: contain`. Portrait mobile screens deliberately retain dark letterboxing rather than cropping or stretching the video. `playsInline`, muted autoplay and a single non-looping playback apply on desktop and mobile. The site itself contains no video player controls or fullscreen API requests.
 
-The exact `public/favicon.png` and `public/logo.png` files are used unchanged. The ivory reveal provides contrast without recoloring the logos. Their original image backgrounds/pixels remain intact. The monogram has an opaque #282828 background baked into the official PNG; it is presented in a matching bordered cartouche. A transparent official master would allow a more seamless production reveal, but is not fabricated or substituted here.
+## Logo and timing
 
-## Timeline and safeguards
+The exact `public/logo.png` is overlaid at the center of the film's illuminated ending. Its opaque white background is preserved, as are all colors, proportions, typography and pixels; no blend modes or filters recolor it. The image stays within the source's native dimensions.
 
-- 0–1.5s: navy scene, exposure reveal and gently moving globe.
-- 1.3–3s: progressively drawn symbolic gold connections and moving particles.
-- 3–4.5s: camera push, brighter key light, converging particle heads.
-- Approximately 4.2–5s: official monogram, then full logo on ivory.
-- 5–6s: full-logo hold, then a short dissolve to the already-mounted homepage.
+The reveal starts at **7.0 seconds of media time**, reaches full opacity at **7.9 seconds**, and subtly scales from 96% to 100%. `requestVideoFrameCallback` tracks decoded frame time; animation-frame/timeupdate fallbacks track `currentTime`. Buffering does not advance the logo independently. It remains visible during the final approximately two seconds. The actual `ended` event freezes the final frame and starts a 550 ms whole-overlay dissolve into the already-mounted premium homepage. There is no former six-second timer and no blank-white intermediate screen.
 
-The visible desktop intro is capped by a six-second timer. Preparation is separate and invisible: the homepage is interactive while the chunk/textures/logos load. Preparation exceeding 1.8 seconds, failed assets, unavailable WebGL, or user interaction abandons the intro. Sustained slow rendering also exits. No artificial loader or minimum waiting time.
+## Access, accessibility and fallback
 
-A visible Skip Intro button and Escape immediately exit. Focus is contained during the intro, the site wrapper is temporarily inert, and scroll/focus are restored. Visibility changes and a live reduced-motion preference change dismiss it. WebGL resources and listeners are disposed after dismissal/unmount. CSS choreography behind the intro is paused and resumes afterward.
+- Homepage remains fully interactive during invisible preparation. Clicking, typing or scrolling before playback cancels the intro rather than interrupting the user's navigation.
+- The video source is assigned only for eligible visitors. Returning-session and reduced-motion visitors do not request the MP4. Session key `pharma26.global-intro.v1` is preserved from the previous prototype.
+- Reduced motion and unavailable sessionStorage bypass the intro. Save-Data uses the static official-logo alternative without requesting the MP4.
+- Failed media, rejected autoplay, preparation exceeding 2.5 seconds, or a playback stall exceeding two seconds use a skippable static official-logo fallback for 1.5 seconds, followed by the short dissolve. If even the logo cannot load, access returns directly to the homepage.
+- Visible Skip Intro and Escape dismiss immediately. The background is temporarily inert, focus stays on Skip Intro, and focus/scroll are restored afterward. A live reduced-motion change or hidden tab ends the intro.
+- Video playback stops and the source is released on skip, completion, fallback, or unmount. A 16-second playback watchdog prevents an indefinite overlay if browser events fail.
+- Existing homepage CSS choreography pauses behind the intro and resumes afterward.
 
-A sessionStorage flag records the first attempt/show; blocked sessionStorage bypasses the intro. Reduced-motion and Save-Data users see the homepage directly. Mobile (<768px), very low reported device memory, or at most two logical cores receive a short 1.8-second official-logo alternative without downloading Three.js. Hardware signals are heuristics, not a guarantee of frame rate.
+## Verification and review
 
-## Dependencies and assets
+Run `npm ci`, `npm run lint`, `npm run build`, then `npm run test:intro`. Playwright uses `/usr/bin/chromium` by default; set `CHROMIUM_PATH` on another machine. It serves the production build on port 4173.
 
-- Three.js: MIT, https://github.com/mrdoob/three.js/blob/r180/LICENSE
-- Existing React/Vite/CSS stack for integration and overlay choreography. No GSAP, Drei, R3F, API keys or paid services.
-- Natural Earth 1:110m land polygons: public domain, commercial use permitted.
-  Source: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_land.geojson
-  Terms: https://www.naturalearthdata.com/about/terms-of-use/
-  Source SHA-256 used: `9e0729ee253ca7d7a5c4ae9395fb1902264c5377c52e224d13dd85010e2835d9`.
-  License copy: `public/textures/LICENSE-natural-earth.md`.
-- `scripts/create-globe-texture.py` creates the styled map and bump mask from that GeoJSON (optional generation requires Pillow). Committed texture outputs total about 87 KB. All runtime assets are served locally.
-- The lazy Three.js scene chunk is approximately 125 KB gzip; it is not requested for returning-session, reduced-motion or compact-mode visitors.
-- Paths are illustrative, not a claim about offices, clients, partnerships, service coverage or shipping routes. The on-screen caption explicitly says so.
+Eight browser tests exercise actual MP4 decoding/advancing frames and full natural playback, reveal timing at the media clock, logo hold and natural end transition, mobile inline playback/aspect ratio, skip/Escape/focus/session behavior, reduced-motion/no-download behavior, slow loading without blocking navigation, network/autoplay failure fallback, and preserved routes/Formspree configuration. They verify the video is muted and does not loop, and that no Three.js scene is requested. No contact form is submitted.
 
-## Verification
+Motion previews record the working browser page playing the supplied MP4 with the real HTML logo overlay and transition. They are not a separately composited promotional video. Cloud Chromium and a mobile viewport were verified; physical iOS/Safari autoplay/performance has not been certified.
 
-Run `npm ci`, `npm run lint`, `npm run build`, then `npm run test:intro`.
-Browser tests use `@playwright/test` and local Chromium at `/usr/bin/chromium`; set `CHROMIUM_PATH` on another system. The suite serves the production build on port 4173 and writes artifacts outside the checkout, in `/tmp/pharma26-intro-results`.
-
-Nine browser tests passed: timed 3D/official-logo sequence, skip/focus/session behavior, Escape, reduced motion and lazy-loading bypass, mobile alternative, slow-load navigation, missing assets, WebGL/storage failures, and existing routes/Formspree configuration. Tests do not submit the contact form. Browser verification used Chromium software WebGL in this cloud machine; no physical-device GPU or cross-browser performance certification is claimed.
-
-## Production quality limits
-
-This is a working visual-direction prototype, not an approved luxury brand film. A professional final could benefit from art-directed topographic/PBR textures, refined compositing and restrained bloom, or an offline-rendered six-second sequence with a high-quality poster and mobile crop. Such a film would provide more controlled lighting and optical effects than the current lean WebGL implementation. Both official logos must still remain exact graphical overlays.
+No main-branch modification, merge, deployment, domain update or environment publication is part of this change.
