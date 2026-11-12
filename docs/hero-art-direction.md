@@ -1,13 +1,27 @@
-# Cosmetic hero prototype
+# Cinematic cosmetic hero prototype
 
-The homepage uses original AI-generated concept imagery of neutral cosmetic packaging. It is illustrative, not a photograph of inventory or PHARMA26-manufactured products. The visible caption communicates that distinction. No external stock imagery or product trademarks are used.
+The homepage uses three original AI-generated transparent product cutouts: neutral serum and lotion bottles plus a cream jar. All are unbranded and illustrative, not actual PHARMA26 inventory. The visible caption makes this distinction explicit.
 
-The two WebP sizes in public/images are derived from the generated still. Motion supplies entrance, spring-smoothed desktop pointer tilt and scroll translation/zoom. CSS supplies a very small ambient movement of the entire composition. These are 2.5D image transforms: there are no independently moving products, real-time reflections, camera orbit, 3D models or rendered video. No new runtime dependencies were added. Mobile/coarse-pointer and reduced-motion modes use static artwork; desktop has a pause control and motion stops outside the viewport.
+## Implemented motion
 
-## Recommended production asset route
+- Approximately three-second opening: masked headline lines, staggered product arrivals from different directions, scale/angle settling and a soft lighting pass.
+- Independent 9-, 10- and 11-second floating loops with small planar and perspective rotations.
+- Layer-specific spring-smoothed pointer offsets and scroll parallax: the foreground jar travels farther than the rear lotion bottle.
+- Animated soft shadow layers and a restrained repeating light overlay.
+- Desktop pause control, offscreen/tab-hidden suspension, static mobile composition, and reduced-motion support.
 
-For luxury advertising quality, commission a short offline-rendered loop and matching poster from a 3D artist: unbranded bottle and jar models with modeled wall thickness and beveled edges; physically based glass, liquid and brushed metal materials; studio HDR lighting; slow independent product float/rotation and a restrained camera move. Deliver desktop and mobile crops, WebM/MP4 variants and a color-matched WebP poster. Confirm commercial usage rights to models, textures and lighting assets. Do not use actual supplier products without permission.
+Motion handles pointer/scroll transforms; CSS handles choreography and loops. No new dependencies were added. Mobile skips the product entrance and ongoing loop. Existing routes and the contact form are unchanged.
 
-Pre-rendered animation is recommended for predictable optical quality and low GPU use. Real-time React Three Fiber is appropriate only if genuine product inspection or camera control becomes a requirement, with optimized GLB assets, compressed textures, a tested transmission/lighting solution, adaptive rendering and a poster fallback. Basic geometric stand-ins are not an adequate substitute for those assets.
+## What this is not
 
-Validation: npm run lint; npm run build; Chromium viewport checks at 1440, 768, 390 and 320 pixels; image decoding, overflow, pause and reduced-motion checks; existing routes and Formspree action preserved. This prototype does not submit contact forms.
+This is a 2.5D campaign prototype: independent image planes in a perspective composition, not modeled 3D products. The glass and metallic reflections are baked into AI-generated images. The lighting sweep is a composited effect, not physical relighting. Perspective rotation cannot reveal unseen surfaces. There is no product video in the website; the supplied motion preview records the working browser implementation.
+
+## Recommended production assets
+
+Commission a short offline-rendered loop and matching poster for true luxury product-film quality. Required assets: unbranded bottle/jar meshes with wall thickness and bevels; physically based glass, cream and brushed metal; studio HDR lighting; independent product float/rotation and a restrained camera move. Deliver desktop/mobile crops, optimized WebM/MP4 and WebP posters, and commercial usage rights for models, textures and lighting.
+
+Offline rendering is recommended for reliable glass/reflection quality and modest browser GPU use. React Three Fiber becomes worthwhile if real camera or product interaction is required; it needs optimized GLBs, compressed textures, tuned transmission/lighting, adaptive resolution and static fallbacks. GSAP would duplicate the current Motion/CSS choreography without solving the missing 3D-asset requirement.
+
+## Validation
+
+npm run lint and npm run build. Browser checks at 1440, 768, 390 and 320 pixels: image decoding, horizontal overflow, actual product movement, pause behavior, reduced motion, existing routes, and preserved Formspree endpoint. No form submission or deployment.
