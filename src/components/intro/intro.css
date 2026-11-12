@@ -1,5 +1,5 @@
 .video-intro { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:#080f19; color:#f6f4f0; visibility:hidden; pointer-events:none; opacity:0; overflow:hidden; }
-.video-intro.intro-visible { visibility:visible; pointer-events:auto; opacity:1; transition:opacity .35s ease; }
+.video-intro.intro-visible { visibility:visible; pointer-events:auto; opacity:1; }
 .video-intro.intro-exiting { opacity:0; transition:opacity .55s ease; }
 /* Preserve every pixel of the source composition; no cropping/stretching on portrait screens. */
 .intro-film-frame { position:relative; width:min(100vw,177.777778vh); height:min(56.25vw,100vh); }

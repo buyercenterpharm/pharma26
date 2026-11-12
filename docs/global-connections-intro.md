@@ -22,7 +22,7 @@ The reveal starts at **7.0 seconds of media time**, reaches full opacity at **7.
 
 ## Access, accessibility and fallback
 
-- Homepage remains fully interactive during invisible preparation. Clicking, typing or scrolling before playback cancels the intro rather than interrupting the user's navigation.
+- On eligible first visits, an inline HTML dark curtain is established before application JavaScript can paint the homepage. React takes over with the same opaque dark stage during video preparation: there is no entrance fade exposing the site. Skip Intro and Escape provide immediate access while preparing. The HTML curtain releases after four seconds if the application does not initialize; video preparation still falls back after 2.5 seconds. Returning-session, reduced-motion and other-route visits bypass the curtain.
 - The video source is assigned only for eligible visitors. Returning-session and reduced-motion visitors do not request the MP4. Session key `pharma26.global-intro.v1` is preserved from the previous prototype.
 - Reduced motion and unavailable sessionStorage bypass the intro. Save-Data uses the static official-logo alternative without requesting the MP4.
 - Failed media, rejected autoplay, preparation exceeding 2.5 seconds, or a playback stall exceeding two seconds use a skippable static official-logo fallback for 1.5 seconds, followed by the short dissolve. If even the logo cannot load, access returns directly to the homepage.
@@ -34,7 +34,7 @@ The reveal starts at **7.0 seconds of media time**, reaches full opacity at **7.
 
 Run `npm ci`, `npm run lint`, `npm run build`, then `npm run test:intro`. Playwright uses `/usr/bin/chromium` by default; set `CHROMIUM_PATH` on another machine. It serves the production build on port 4173.
 
-Eight browser tests exercise actual MP4 decoding/advancing frames and full natural playback, reveal timing at the media clock, logo hold and natural end transition, mobile inline playback/aspect ratio, skip/Escape/focus/session behavior, reduced-motion/no-download behavior, slow loading without blocking navigation, network/autoplay failure fallback, and preserved routes/Formspree configuration. They verify the video is muted and does not loop, and that no Three.js scene is requested. No contact form is submitted.
+Nine browser tests exercise actual MP4 decoding/advancing frames and full natural playback, reveal timing at the media clock, logo hold and natural end transition, mobile inline playback/aspect ratio, skip/Escape/focus/session behavior, reduced-motion/no-download behavior, dark first paint even with delayed application JavaScript, skip access during slow preparation, network/autoplay failure fallback, and preserved routes/Formspree configuration. They verify the video is muted and does not loop, and that no Three.js scene is requested. No contact form is submitted.
 
 Motion previews record the working browser page playing the supplied MP4 with the real HTML logo overlay and transition. They are not a separately composited promotional video. Cloud Chromium and a mobile viewport were verified; physical iOS/Safari autoplay/performance has not been certified.
 

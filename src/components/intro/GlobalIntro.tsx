@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import './intro.css';
@@ -10,12 +10,23 @@ type Phase = 'preparing' | 'playing' | 'fallback' | 'exiting' | 'done';
 
 export default function GlobalIntro() {
   const { pathname } = useLocation();
-  const [phase, setPhase] = useState<Phase>('preparing');
+  const [phase, setPhase] = useState<Phase>(() => {
+    try {
+      return pathname === '/' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !sessionStorage.getItem(SESSION_KEY) ? 'preparing' : 'done';
+    } catch { return 'done'; }
+  });
   const [fallback, setFallback] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
   const skip = useRef<HTMLButtonElement>(null);
   const finishRef = useRef<() => void>(() => {});
+
+  // Hand off the early HTML curtain only after React's dark stage is in the DOM.
+  useLayoutEffect(() => {
+    window.dispatchEvent(new Event('pharma26:intro-ready'));
+    document.documentElement.removeAttribute('data-intro-boot');
+    document.getElementById('intro-boot')?.remove();
+  }, []);
 
   useEffect(() => {
     if (pathname !== '/') { setPhase('done'); return; }
@@ -86,12 +97,8 @@ export default function GlobalIntro() {
     };
     const onTime = () => syncLogo(video.currentTime);
     const onEnded = () => { syncLogo(video.duration); exit(); };
-    const userIntent = () => { if (!shown) finish(); };
     const onVisibility = () => { if (document.hidden) finish(); };
     const onPreference = () => { if (reduced.matches) finish(); };
-    window.addEventListener('pointerdown', userIntent);
-    window.addEventListener('keydown', userIntent);
-    window.addEventListener('wheel', userIntent, { passive: true });
     document.addEventListener('visibilitychange', onVisibility);
     reduced.addEventListener('change', onPreference);
     video.addEventListener('playing', onPlaying);
@@ -115,13 +122,12 @@ export default function GlobalIntro() {
       video.removeEventListener('playing', onPlaying); video.removeEventListener('waiting', onWaiting);
       video.removeEventListener('error', showFallback); video.removeEventListener('ended', onEnded); video.removeEventListener('timeupdate', onTime);
       video.pause(); video.removeAttribute('src'); video.load();
-      window.removeEventListener('pointerdown', userIntent); window.removeEventListener('keydown', userIntent); window.removeEventListener('wheel', userIntent);
       document.removeEventListener('visibilitychange', onVisibility); reduced.removeEventListener('change', onPreference);
     };
   }, [pathname]);
 
-  const visible = phase === 'playing' || phase === 'fallback' || phase === 'exiting';
-  useEffect(() => {
+  const visible = phase !== 'done' && pathname === '/';
+  useLayoutEffect(() => {
     if (!visible) return;
     const site = document.getElementById('site-content');
     const before = document.activeElement as HTMLElement | null;

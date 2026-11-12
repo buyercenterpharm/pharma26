@@ -3,10 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      #intro-boot { display:none; }
+      html[data-intro-boot] { background:#080f19; }
+      html[data-intro-boot] #root { visibility:hidden; }
+      html[data-intro-boot] #intro-boot { position:fixed; inset:0; z-index:200; display:block; background:#080f19; }
+      #intro-boot button { position:absolute; right:5%; bottom:4%; padding:13px 20px; border:1px solid #c6a66a88; background:#0a192f; color:#f6f4f0; font:12px system-ui; cursor:pointer; }
+      #intro-boot button:focus-visible { outline:2px solid #f6f4f0; outline-offset:4px; }
+    </style>
+    <script>
+      (() => {
+        const key = 'pharma26.global-intro.v1';
+        try {
+          if (location.pathname !== '/' || matchMedia('(prefers-reduced-motion: reduce)').matches || sessionStorage.getItem(key)) return;
+        } catch { return; }
+        document.documentElement.setAttribute('data-intro-boot', '');
+        const release = () => {
+          try { sessionStorage.setItem(key, 'seen'); } catch {}
+          document.documentElement.removeAttribute('data-intro-boot');
+          document.getElementById('intro-boot')?.remove();
+          cleanup();
+        };
+        const keyboard = event => { if (event.key === 'Escape') release(); };
+        const timer = setTimeout(release, 4000);
+        const cleanup = () => {
+          clearTimeout(timer);
+          window.removeEventListener('keydown', keyboard);
+          window.removeEventListener('pharma26:skip-intro', release);
+          window.removeEventListener('pharma26:intro-ready', cleanup);
+        };
+        window.addEventListener('keydown', keyboard);
+        window.addEventListener('pharma26:skip-intro', release);
+        window.addEventListener('pharma26:intro-ready', cleanup);
+      })();
+    </script>
     <title>PHARMA26 LTD</title>
     <link rel="icon" type="image/png" href="/logo.png" />
   </head>
   <body>
+    <div id="intro-boot"><button type="button" onclick="window.dispatchEvent(new Event('pharma26:skip-intro'))">Skip Intro</button></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

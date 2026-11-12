@@ -50,11 +50,25 @@ test('mobile plays inline with original aspect ratio and synchronized logo',asyn
   await expect.poll(()=>page.locator('.intro-full-logo').evaluate(e=>Number(getComputedStyle(e).opacity))).toBeGreaterThan(.95);
   await page.getByRole('button',{name:'Skip Intro'}).click();await expect(page.locator(intro)).toHaveCount(0);
 });
-test('slow loading leaves the website accessible and navigation cancels the intro',async({page})=>{
+test('preparation shows a dark curtain immediately and Skip Intro preserves access',async({page})=>{
   await page.route('**/video/*.mp4',async route=>{await new Promise(r=>setTimeout(r,3500));await route.abort();});
-  await page.goto('/');await expect(page.locator('h1')).toBeVisible();
-  expect(await page.locator('#site-content').evaluate((e:HTMLElement)=>e.inert)).toBe(false);
-  await page.getByRole('link',{name:'Request a Quote'}).click();await expect(page).toHaveURL(/\/contact$/);await expect(page.locator(intro)).toHaveCount(0);
+  await page.goto('/');
+  await expect(page.locator(intro)).toHaveAttribute('data-phase','preparing');
+  await expect(page.locator(intro)).toHaveCSS('opacity','1');
+  await expect(page.locator(intro)).toHaveCSS('background-color','rgb(8, 15, 25)');
+  expect(await page.locator('#site-content').evaluate((e:HTMLElement)=>e.inert)).toBe(true);
+  await page.getByRole('button',{name:'Skip Intro'}).click();
+  await page.getByRole('link',{name:'Request a Quote'}).click();await expect(page).toHaveURL(/\/contact$/);
+});
+test('HTML curtain precedes application JavaScript and can be skipped',async({page})=>{
+  await page.route('**/assets/index-*.js',async route=>{await new Promise(r=>setTimeout(r,2200));await route.continue();});
+  await page.goto('/',{waitUntil:'commit'});
+  await expect(page.locator('#intro-boot')).toBeVisible();
+  await expect(page.locator('#root')).toHaveCSS('visibility','hidden');
+  await page.locator('#intro-boot button').click();
+  await expect(page.locator('#intro-boot')).toHaveCount(0);
+  await expect(page.locator('h1')).toBeVisible();
+  await expect(page.locator(intro)).toHaveCount(0);
 });
 test('failed video uses a short static official-logo fallback',async({page})=>{
   await page.route('**/video/*.mp4',route=>route.abort());await page.goto('/');
