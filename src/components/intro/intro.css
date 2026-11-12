@@ -26,9 +26,9 @@
 @keyframes world-exposure { 0%{opacity:0;transform:scale(1.025)} 18%,64%{opacity:1;transform:scale(1)} 75%,100%{opacity:0;transform:scale(1.045)} }
 @keyframes intro-editorial { 0%,10%{opacity:0;transform:translateY(12px)} 22%,55%{opacity:1;transform:translateY(0)} 68%,100%{opacity:0;transform:translateY(-10px)} }
 @keyframes ivory-aperture { 0%,65%{opacity:0;clip-path:circle(0% at 50% 50%)} 78%,100%{opacity:1;clip-path:circle(100% at 50% 50%)} }
-@keyframes monogram-reveal { 0%,70%{opacity:0;transform:scale(.95)} 75%,77%{opacity:1;transform:scale(1)} 80%,100%{opacity:0;transform:scale(1.035)} }
-@keyframes logo-reveal { 0%,81%{opacity:0;transform:translateY(10px)} 85%,100%{opacity:1;transform:translateY(0)} }
-@keyframes intro-depart { 0%,93%{opacity:1} 100%{opacity:0} }
+@keyframes monogram-reveal { 0%,68%{opacity:0;transform:scale(.95)} 72%,74%{opacity:1;transform:scale(1)} 77%,100%{opacity:0;transform:scale(1.035)} }
+@keyframes logo-reveal { 0%,77%{opacity:0;transform:translateY(10px)} 81%,100%{opacity:1;transform:translateY(0)} }
+@keyframes intro-depart { 0%,96%{opacity:1} 100%{opacity:0} }
 .intro-compact.intro-playing { animation:intro-depart 1.8s linear forwards; background:#f6f4f0; }
 .intro-compact .intro-canvas,.intro-compact .intro-vignette,.intro-compact .intro-editorial,.intro-compact .intro-monogram,.intro-compact .intro-ivory { display:none; }
 .intro-compact .intro-full-logo { animation:compact-logo 1.8s both; }

@@ -10,6 +10,8 @@ test('3D sequence ends within six seconds, shows official logo, and restores the
   await expect(page.getByRole('button',{name:'Skip Intro'})).toBeFocused();
   await expect(page.locator('.intro-full-logo')).toHaveAttribute('src','/logo.png');
   await expect.poll(()=>page.locator('.intro-full-logo').evaluate(e=>Number(getComputedStyle(e).opacity)),{timeout:6000,intervals:[80]}).toBeGreaterThan(.8);
+  await page.waitForTimeout(400);
+  await expect(page.locator('.intro-full-logo')).toBeVisible();
   await expect(page.locator('.global-intro')).toHaveCount(0,{timeout:2000});
   expect(Date.now()-start).toBeLessThan(6500);
   expect(await page.locator('#site-content').evaluate((e:HTMLElement)=>e.inert)).toBe(false);
