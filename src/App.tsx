@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
+import GlobalIntro from './components/intro/GlobalIntro';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -20,7 +21,8 @@ export default function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col">
+      <GlobalIntro />
+      <div id="site-content" className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow">
           <Routes>
