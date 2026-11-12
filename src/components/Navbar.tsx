@@ -1,89 +1,27 @@
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
+const links = [{name:'Home',path:'/'},{name:'About Us',path:'/about'},{name:'Products',path:'/products'},{name:'How It Works',path:'/how-it-works'}];
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
   const location = useLocation();
-
+  const toggle = useRef<HTMLButtonElement>(null);
+  const reduced = useReducedMotion();
+  useEffect(() => setOpen(false), [location.pathname]);
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About Us', path: '/about' },
-    { name: 'Products', path: '/products' },
-    { name: 'How It Works', path: '/how-it-works' },
-    { name: 'Contact', path: '/contact' },
-  ];
-
-  return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass-nav pt-1 pb-2' : 'bg-transparent pt-2 pb-4'}`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center">
-        <Link to="/" className="flex items-center mb-2">
-          <img 
-            src="/logo.png" 
-            alt="PHARMA26 LTD" 
-            className="h-16 md:h-28 w-auto object-contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent && !parent.querySelector('.fallback-logo')) {
-                const span = document.createElement('span');
-                span.className = 'fallback-logo text-xl font-bold tracking-tighter text-brand-blue';
-                span.innerHTML = 'PHARMA<span class="text-brand-accent">26</span> LTD';
-                parent.appendChild(span);
-              }
-            }}
-          />
-        </Link>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex space-x-8 items-center border-t border-brand-blue/10 pt-3 w-full justify-center">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-colors hover:text-brand-accent ${
-                location.pathname === link.path ? 'text-brand-accent' : 'text-brand-blue/70'
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-
-        {/* Mobile Toggle - Absolute positioned to keep logo centered */}
-        <button className="md:hidden text-brand-blue absolute left-6 top-6" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-full left-0 w-full bg-white border-b border-brand-grey p-6 flex flex-col space-y-4 md:hidden"
-        >
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              onClick={() => setIsOpen(false)}
-              className="text-lg font-medium text-brand-blue"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </motion.div>
-      )}
-    </nav>
-  );
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape' && open) { setOpen(false); toggle.current?.focus(); } };
+    const media = window.matchMedia('(min-width: 900px)');
+    const resize = () => { if (media.matches) setOpen(false); };
+    window.addEventListener('keydown', close); media.addEventListener('change', resize);
+    return () => { window.removeEventListener('keydown', close); media.removeEventListener('change', resize); };
+  }, [open]);
+  return <header className="premium-header"><nav aria-label="Main navigation" className="premium-nav">
+    <Link to="/" className="premium-logo" aria-label="PHARMA26 LTD home"><img src="/logo.png" alt="PHARMA26 LTD" /></Link>
+    <div className="desktop-links">{links.map(link => <Link key={link.path} to={link.path} aria-current={location.pathname === link.path ? 'page' : undefined}>{link.name}</Link>)}</div>
+    <Link to="/contact" className="nav-contact">Let’s Talk <ArrowUpRight size={16} /></Link>
+    <button ref={toggle} className="menu-toggle" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
+    <AnimatePresence>{open && <motion.div id="mobile-navigation" className="mobile-links" initial={reduced ? false : {opacity:0,y:-8}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:reduced ? 0 : .2}}>{[...links,{name:'Contact',path:'/contact'}].map((link,i) => <Link key={link.path} to={link.path} onClick={()=>setOpen(false)} aria-current={location.pathname === link.path ? 'page' : undefined}><span>0{i+1}</span>{link.name}<ArrowUpRight size={18}/></Link>)}</motion.div>}</AnimatePresence>
+  </nav></header>;
 }

@@ -1,46 +1,14 @@
-import { motion } from 'motion/react';
+import CinematicHero from '../components/CinematicHero';
 import { ArrowRight, Globe, ShieldCheck, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
     <div className="pt-20">
-      {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-center overflow-hidden bg-brand-grey">
-        <div className="absolute inset-0 z-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-blue via-transparent to-transparent"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl"
-          >
-            <span className="text-xs font-bold uppercase tracking-[0.3em] text-brand-blue/50 mb-4 block">
-              International B2B Distribution
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold text-brand-blue leading-[1.1] mb-8">
-              International Trading & Distribution of Cosmetic Products
-            </h1>
-            <p className="text-lg text-brand-blue/70 mb-10 leading-relaxed max-w-xl">
-              PHARMA26 LTD provides high-scale wholesale solutions for the global beauty and skincare industry. We bridge the gap between approved suppliers and international distributors.
-            </p>
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/contact" className="btn-primary flex items-center justify-center">
-                Contact Us <ArrowRight className="ml-2" size={18} />
-              </Link>
-              <Link to="/about" className="btn-secondary flex items-center justify-center">
-                Learn More
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <CinematicHero />
 
       {/* Intro Section */}
-      <section className="section-padding bg-white">
+      <section id="company-introduction" className="section-padding bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
