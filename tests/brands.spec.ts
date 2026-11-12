@@ -1,0 +1,60 @@
+import { test, expect } from '@playwright/test';
+import { brands, brandCategories, categoryCount, findBrands } from '../src/data/brands';
+
+test('catalogue has the complete category counts and one record per brand', () => {
+  expect(brands).toHaveLength(75); expect(new Set(brands.map(b=>b.id)).size).toBe(75);
+  expect(new Set(brands.map(b=>b.name)).size).toBe(75);
+  expect(brandCategories.map(c=>categoryCount(c.id))).toEqual([28,14,4,11,5,14]);
+  expect(brands.reduce((total,b)=>total+b.categories.length,0)).toBe(76);
+  expect(brands.find(b=>b.name==='Chanel')?.categories).toEqual(['cosmetics','perfumes']);
+  expect(brands.find(b=>b.id==='molnlycke')?.name).toBe('Mölnlycke');
+  expect(brands.find(b=>b.id==='eneomey')?.name).toBe('ENEOMEY');
+  expect(brands.filter(b=>b.logo)).toHaveLength(0);
+});
+test('all brands and all category filters display correct counts without duplicate Chanel',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/brands');await expect(page.getByRole('heading',{level:1})).toContainText('Our Brands');
+  await expect(page.locator('.brand-card')).toHaveCount(75);await expect(page.locator('[data-brand-id="chanel"]')).toHaveCount(1);
+  await expect(page.locator('.video-intro')).toHaveCount(0);
+  for(const c of brandCategories){
+    const button=page.getByRole('button',{name:new RegExp('^'+c.label+' ')});
+    await button.click();await expect(button).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('.brand-card')).toHaveCount(categoryCount(c.id));
+  }
+  await expect(page.locator('.brand-card img')).toHaveCount(0);expect(errors).toEqual([]);
+});
+test('search ignores accents/punctuation, accepts confirmed-name aliases and combines with categories',async({page})=>{
+  await page.goto('/brands');const search=page.getByRole('searchbox',{name:'Search brands'});
+  for(const [query,name] of [['avene','Avène'],['kerastase','Kérastase'],['molnycke','Mölnlycke'],['eneomay','ENEOMEY'],["l occitane","L'Occitane"]]){
+    await search.fill(query);await expect(page.locator('.brand-card')).toHaveCount(1);await expect(page.locator('.brand-card h3')).toHaveText(name);
+  }
+  await search.fill('chanel');await page.getByRole('button',{name:/^Perfumes /}).click();await expect(page.locator('.brand-card')).toHaveCount(1);
+  await page.reload();await expect(search).toHaveValue('chanel');await expect(page.getByRole('button',{name:/^Perfumes /})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:/^Pharmacy /}).click();await expect(page.getByText('No brands match your search.')).toBeVisible();
+  await page.getByRole('button',{name:'Reset all filters'}).click();await expect(page.locator('.brand-card')).toHaveCount(75);await expect(search).toHaveValue('');
+  await search.fill('unknownbrandxyz');await page.getByRole('button',{name:'Clear search'}).click();await expect(page.locator('.brand-card')).toHaveCount(75);
+});
+test('filter URL and invalid-category fallback',async({page})=>{
+  await page.goto('/brands?category=professional-haircare&q=rene');await expect(page.locator('.brand-card h3')).toHaveText('René Furterer');
+  await page.goto('/brands?category=not-a-category');await expect(page.locator('.brand-card')).toHaveCount(75);
+  expect(findBrands('all','roge cavailles').map(b=>b.name)).toEqual(['Rogé Cavaillès']);
+});
+test('desktop/mobile navigation, responsive layouts and reduced-motion rendering',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  for(const width of [1440,1024,900,768,390,320]){
+    await page.setViewportSize({width,height:900});await page.goto('/brands');
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    if(width<900){await page.getByRole('button',{name:'Open menu'}).click();await page.locator('#mobile-navigation').getByRole('link',{name:'Our Brands'}).click();await expect(page.getByRole('button',{name:'Open menu'})).toHaveAttribute('aria-expanded','false');}
+    else await expect(page.locator('.desktop-links').getByRole('link',{name:'Our Brands'})).toBeVisible();
+  }
+  await page.getByRole('link',{name:'Contact our trading team'}).click();await expect(page).toHaveURL(/\/contact$/);
+  await expect(page.locator('form')).toHaveAttribute('action','https://formspree.io/f/xqegzjoz');
+});
+test('homepage showcase links to the catalogue and carries the sourcing disclaimer',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
+  await expect(page.getByRole('heading',{name:'Brands We Source'})).toBeVisible();
+  await expect(page.locator('.showcase-grid li')).toHaveCount(8);await expect(page.locator('.showcase-grid img')).toHaveCount(0);
+  await expect(page.locator('.brands-showcase .brand-disclaimer')).toContainText('do not imply official affiliation or endorsement');
+  await page.getByRole('link',{name:'Explore all 75 brands'}).click();await expect(page).toHaveURL(/\/brands$/);
+  await expect(page.locator('.brand-disclaimer')).toContainText('subject to sourcing and market conditions');
+});

@@ -1,3 +1,4 @@
+import BrandsShowcase from '../components/BrandsShowcase';
 import CinematicHero from '../components/CinematicHero';
 import { ArrowRight, Globe, ShieldCheck, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -37,6 +38,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <BrandsShowcase />
 
       {/* CTA Section */}
       <section className="py-24 bg-brand-blue text-white text-center px-6">
