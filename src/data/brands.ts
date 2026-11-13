@@ -44,6 +44,26 @@ export interface Brand {
   aliases?: string[];
   logo?: VerifiedBrandLogo;
 }
+export const bestDealBrandIds = [
+  'la-roche-posay',
+  'vichy',
+  'uriage',
+  'filorga',
+  'caudalie',
+  'embryolisse',
+  'darphin',
+  'isdin',
+  'melvita',
+  'skinceuticals',
+  'eucerin',
+  'cerave',
+  'avene',
+  'biotherm',
+  'lierac',
+  'roge-cavailles',
+  'bioderma',
+] as const;
+export type CatalogueFilter = 'all' | 'best-deals' | BrandCategory;
 // No unverified logos: populate logo only after source/identity and usage review.
 export const brands: Brand[] = [
   {
@@ -246,8 +266,29 @@ export const brands: Brand[] = [
     ]
   },
   {
+    "id": "cerave",
+    "name": "CeraVe",
+    "categories": [
+      "dermocosmetics"
+    ]
+  },
+  {
+    "id": "lierac",
+    "name": "Lierac",
+    "categories": [
+      "dermocosmetics"
+    ]
+  },
+  {
     "id": "lancome",
     "name": "Lancôme",
+    "categories": [
+      "cosmetics"
+    ]
+  },
+  {
+    "id": "biotherm",
+    "name": "Biotherm",
     "categories": [
       "cosmetics"
     ]
@@ -585,8 +626,9 @@ export const categoryLabel = (id: BrandCategory) => brandCategories.find(categor
 export const normalizeBrandSearch = (value: string) => value.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('en').replace(/[^a-z0-9]/g, '');
 export function findBrands(category: string, query: string) {
   const search = normalizeBrandSearch(query);
-  return brands.filter(brand => (category === 'all' || brand.categories.includes(category as BrandCategory)) &&
+  return brands.filter(brand => (category === 'all' || (category === 'best-deals' ? bestDealBrandIds.includes(brand.id as typeof bestDealBrandIds[number]) : brand.categories.includes(category as BrandCategory))) &&
     [brand.name, ...(brand.aliases ?? [])].some(name => normalizeBrandSearch(name).includes(search)))
     .sort((a,b) => a.name.localeCompare(b.name, 'en', {sensitivity:'base'}));
 }
+export const isBestDeal = (brand: Brand) => bestDealBrandIds.includes(brand.id as typeof bestDealBrandIds[number]);
 export const showcasedBrands = ['la-roche-posay','nuxe','caudalie','la-mer','creed','kerastase','contour-next','medela'].map(id => brands.find(brand => brand.id === id)!);
