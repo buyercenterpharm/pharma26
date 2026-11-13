@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
-const links = [{name:'Home',path:'/'},{name:'About Us',path:'/about'},{name:'Products',path:'/products'},{name:'Our Brands',path:'/brands'},{name:'How It Works',path:'/how-it-works'}];
+const links = [{name:'Home',path:'/'},{name:'About Us',path:'/about'},{name:'Brands & Products',path:'/brands'},{name:'How It Works',path:'/how-it-works'}];
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
