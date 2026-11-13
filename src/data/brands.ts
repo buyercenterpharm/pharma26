@@ -61,6 +61,7 @@ export const bestDealBrandIds = [
   'biotherm',
   'lierac',
   'roge-cavailles',
+  'bioderma',
 ] as const;
 export type CatalogueFilter = 'all' | 'best-deals' | BrandCategory;
 // No unverified logos: populate logo only after source/identity and usage review.

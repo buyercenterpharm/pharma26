@@ -10,8 +10,8 @@ test('catalogue has the complete category counts and one record per brand', () =
   expect(brands.find(b=>b.id==='molnlycke')?.name).toBe('Mölnlycke');
   expect(brands.find(b=>b.id==='eneomey')?.name).toBe('ENEOMEY');
   expect(brands.filter(b=>b.logo)).toHaveLength(0);
-  expect(bestDealBrandIds).toEqual(['la-roche-posay','vichy','uriage','filorga','caudalie','embryolisse','darphin','isdin','melvita','skinceuticals','eucerin','cerave','avene','biotherm','lierac','roge-cavailles']);
-  expect(new Set(findBrands('best-deals','').map(brand=>brand.id)).size).toBe(16);
+  expect(bestDealBrandIds).toEqual(['la-roche-posay','vichy','uriage','filorga','caudalie','embryolisse','darphin','isdin','melvita','skinceuticals','eucerin','cerave','avene','biotherm','lierac','roge-cavailles','bioderma']);
+  expect(new Set(findBrands('best-deals','').map(brand=>brand.id)).size).toBe(17);
 });
 test('all brands and all category filters display correct counts without duplicate Chanel',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -26,7 +26,7 @@ test('all brands and all category filters display correct counts without duplica
   }
   await expect(page.locator('.brand-card img')).toHaveCount(0);expect(errors).toEqual([]);
 });
-test('Best Deals filter contains exactly the confirmed sixteen brands and combines with search',async({page})=>{
+test('Best Deals filter contains exactly the confirmed seventeen brands and combines with search',async({page})=>{
   await page.goto('/brands');
   const filter=page.getByRole('button',{name:/^Best Deals/});
   await expect(filter).toBeVisible();
@@ -35,8 +35,8 @@ test('Best Deals filter contains exactly the confirmed sixteen brands and combin
   await filter.click();
   await expect(page).toHaveURL(/category=best-deals/);
   await expect(filter).toHaveAttribute('aria-pressed','true');
-  await expect(page.locator('.brand-card')).toHaveCount(16);
-  await expect(page.locator('.best-deal-badge')).toHaveCount(16);
+  await expect(page.locator('.brand-card')).toHaveCount(17);
+  await expect(page.locator('.best-deal-badge')).toHaveCount(17);
   await expect(page.getByText('Explore our selection of brands with particularly competitive B2B sourcing conditions.')).toBeVisible();
   expect(await page.locator('.brand-grid>li').evaluateAll(elements=>elements.map(element=>element.getAttribute('data-brand-id')))).toEqual([...bestDealBrandIds].sort((a,b)=>brands.find(brand=>brand.id===a)!.name.localeCompare(brands.find(brand=>brand.id===b)!.name,'en',{sensitivity:'base'})));
   await page.getByRole('searchbox',{name:'Search brands'}).fill('Eucerin');
