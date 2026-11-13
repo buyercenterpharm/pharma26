@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 
 const intro = '.video-intro';
 test('supplied MP4 plays fully and reveals the official logo at its ending', async ({ page }) => {
@@ -82,9 +83,13 @@ test('autoplay rejection uses the static fallback',async({page})=>{
   await page.goto('/');await expect(page.locator(intro)).toHaveAttribute('data-phase','fallback');
   await page.keyboard.press('Escape');await expect(page.locator(intro)).toHaveCount(0);
 });
-test('no Three.js requests, and all other routes/forms remain intact',async({page})=>{
+test('Vercel serves the SPA entry point for direct application routes',()=>{
+  const config=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
+  expect(config.rewrites).toContainEqual({source:'/(.*)',destination:'/index.html'});
+});
+test('no Three.js requests, and direct routes, refreshes and forms remain intact',async({page})=>{
   const three:string[]=[];page.on('request',r=>{if(/globeScene|earth-land|earth-relief|three\.js/.test(r.url()))three.push(r.url());});
-  for(const path of ['/about','/products','/how-it-works','/contact']){await page.goto(path);await expect(page.locator('h1')).toBeVisible();await expect(page.locator(intro)).toHaveCount(0);}
+  for(const path of ['/about','/products','/brands','/how-it-works','/contact']){await page.goto(path);await expect(page.locator('h1')).toBeVisible();await page.reload();await expect(page.locator('h1')).toBeVisible();await expect(page.locator(intro)).toHaveCount(0);}
   await expect(page.locator('form')).toHaveAttribute('action','https://formspree.io/f/xqegzjoz');await expect(page.locator('form')).toHaveAttribute('method','POST');
   await page.goto('/');await expect(page.locator(intro)).toHaveAttribute('data-phase','playing');expect(three).toEqual([]);
 });

@@ -2,7 +2,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { Search, ArrowUpRight, X } from 'lucide-react';
 import BrandMark from '../components/BrandMark';
-import { brands, brandCategories, brandDisclaimer, categoryCount, categoryLabel, findBrands, type BrandCategory } from '../data/brands';
+import { brands, bestDealBrandIds, brandCategories, brandDisclaimer, categoryCount, categoryLabel, findBrands, isBestDeal, type BrandCategory, type CatalogueFilter } from '../data/brands';
 import './brands.css';
 
 const categoryVisuals: Record<BrandCategory, { image: string; detail: string }> = {
@@ -18,7 +18,7 @@ export default function Brands() {
   const [params, setParams] = useSearchParams();
   const query = (params.get('q') ?? '').slice(0,120);
   const requestedCategory = params.get('category') ?? 'all';
-  const category = brandCategories.some(item => item.id === requestedCategory) ? requestedCategory : 'all';
+  const category: CatalogueFilter = requestedCategory === 'best-deals' || brandCategories.some(item => item.id === requestedCategory) ? requestedCategory as CatalogueFilter : 'all';
   const results = findBrands(category, query);
   const reduced = useReducedMotion();
   const update = (key: string, value: string) => {
@@ -69,12 +69,14 @@ export default function Brands() {
         <div className="brand-search"><Search size={18} aria-hidden="true"/><label htmlFor="brand-search" className="sr-only">Search brands</label><input id="brand-search" type="search" value={query} maxLength={120} placeholder="Search a brand…" autoComplete="off" onChange={event => update('q',event.target.value)} aria-controls="brand-results" />{query && <button type="button" aria-label="Clear search" onClick={() => update('q','')}><X size={16}/></button>}</div>
         <div className="brand-filters" role="group" aria-label="Brand categories">
           <button type="button" aria-pressed={category === 'all'} onClick={() => update('category','all')}>All brands <span>{brands.length}</span></button>
+          <button className="best-deals-filter" type="button" aria-pressed={category === 'best-deals'} onClick={() => update('category','best-deals')}>Best Deals <b aria-hidden="true">✦</b> <span>{bestDealBrandIds.length}</span></button>
           {brandCategories.map(item => <button type="button" key={item.id} aria-pressed={category === item.id} onClick={() => update('category',item.id)}>{item.label} <span>{categoryCount(item.id)}</span></button>)}
         </div>
+        {category === 'best-deals' && <p className="best-deals-description">Explore our selection of brands with particularly competitive B2B sourcing conditions.</p>}
       </div>
-      <div className="directory-status"><p role="status" aria-live="polite" aria-atomic="true">{results.length} {results.length === 1 ? 'brand' : 'brands'}{category !== 'all' ? ` · ${categoryLabel(category as Parameters<typeof categoryLabel>[0])}` : ' · All categories'}{query ? ` matching “${query}”` : ''}</p><span>ALPHABETICAL DIRECTORY</span></div>
+      <div className="directory-status"><p role="status" aria-live="polite" aria-atomic="true">{results.length} {results.length === 1 ? 'brand' : 'brands'}{category === 'best-deals' ? ' · Best Deals' : category !== 'all' ? ` · ${categoryLabel(category)}` : ' · All categories'}{query ? ` matching “${query}”` : ''}</p><span>ALPHABETICAL DIRECTORY</span></div>
       <motion.div id="brand-results" key={`${category}:${query}`} initial={reduced ? false : { opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .22 }}>
-        {results.length > 0 ? <ul className="brand-grid">{results.map(brand => <li key={brand.id} data-brand-id={brand.id}><article className="brand-card"><h3><BrandMark brand={brand}/></h3><p>{brand.categories.map(categoryLabel).join(' · ')}</p></article></li>)}</ul> : <div className="brand-empty"><Search size={30} aria-hidden="true"/><h3>No brands match your search.</h3><p>Try another name or explore the full catalogue.</p><button type="button" onClick={() => setParams({},{replace:true})}>Reset all filters <ArrowUpRight size={16}/></button></div>}
+        {results.length > 0 ? <ul className="brand-grid">{results.map(brand => <li key={brand.id} data-brand-id={brand.id}><article className={`brand-card${isBestDeal(brand) ? ' is-best-deal' : ''}`}>{isBestDeal(brand) && <span className="best-deal-badge">Best Deal <b aria-hidden="true">✦</b></span>}<h3><BrandMark brand={brand}/></h3><p>{brand.categories.map(categoryLabel).join(' · ')}</p></article></li>)}</ul> : <div className="brand-empty"><Search size={30} aria-hidden="true"/><h3>No brands match your search.</h3><p>Try another name or explore the full catalogue.</p><button type="button" onClick={() => setParams({},{replace:true})}>Reset all filters <ArrowUpRight size={16}/></button></div>}
       </motion.div>
       <p className="brand-disclaimer">{brandDisclaimer}</p>
     </section>
