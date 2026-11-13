@@ -43,6 +43,8 @@ test('homepage operating model is concise, accurate and scannable', async ({ pag
   await expect(section.getByText('Headquartered in Cyprus, PHARMA26 LTD operates with Belgium-based warehousing through a trusted third-party logistics provider.')).toBeVisible();
   await expect(section.getByText('Our merchandise is stored in Belgium, supporting efficient European and international B2B logistics.')).toBeVisible();
   await expect(section.locator('.trade-flow-card')).toHaveCount(3);
+  await expect(section.locator('.trade-card-photo')).toHaveCount(3);
+  await expect(section.getByText('Illustrative photography — not PHARMA26 offices, facilities or operations.')).toBeVisible();
   await expect(section.getByRole('heading', { name: 'Headquarters' })).toBeVisible();
   await expect(section.getByRole('heading', { name: 'Warehousing & Logistics' })).toBeVisible();
   await expect(section.getByRole('heading', { name: 'B2B Distribution', exact: true })).toBeVisible();

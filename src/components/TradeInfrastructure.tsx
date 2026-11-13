@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, Building2, Globe2, Network, Search, ShieldCheck, Warehouse } from 'lucide-react';
+import { ArrowRight, Network, Search, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './home-operations.css';
 
@@ -9,14 +9,16 @@ const operationalFlow = [
     place: 'CYPRUS',
     title: 'Headquarters',
     description: 'Corporate base and trading coordination.',
-    icon: Building2,
+    photo: '/images/trade-cyprus-architecture.webp',
+    alt: "Illustrative corporate architecture photograph; not PHARMA26's Cyprus headquarters.",
   },
   {
     number: '02',
     place: 'BELGIUM',
     title: 'Warehousing & Logistics',
     description: 'Merchandise stored through a trusted third-party logistics provider.',
-    icon: Warehouse,
+    photo: '/images/trade-belgium-warehouse.webp',
+    alt: 'Illustrative professional warehouse photograph; not the Belgium third-party facility used by PHARMA26.',
     featured: true,
   },
   {
@@ -24,7 +26,8 @@ const operationalFlow = [
     place: 'INTERNATIONAL',
     title: 'B2B Distribution',
     description: 'Sourcing and logistics coordination for professional buyers.',
-    icon: Globe2,
+    photo: '/images/trade-international-logistics.webp',
+    alt: 'Illustrative international container logistics photograph; not a PHARMA26 operation.',
   },
 ];
 
@@ -52,16 +55,20 @@ export default function TradeInfrastructure() {
 
         <ol className="trade-flow" aria-label="PHARMA26 operating model">
           {operationalFlow.map((item, index) => {
-            const Icon = item.icon;
             return <motion.li key={item.place} className={item.featured ? 'trade-flow-card trade-flow-featured' : 'trade-flow-card'} initial={reduced ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .25 }} transition={{ duration: .55, delay: reduced ? 0 : index * .09 }}>
-              <div className="trade-card-top"><span>{item.number}</span><Icon size={28} strokeWidth={1.35} aria-hidden="true" /></div>
-              <p>{item.place}</p>
-              <h3>{item.title}</h3>
-              <span className="trade-card-detail">{item.description}</span>
-              {item.featured && <small>External 3PL facility — not owned or directly operated by PHARMA26.</small>}
+              <img className="trade-card-photo" src={item.photo} alt={item.alt} width="1800" height="1200" loading="lazy" decoding="async" />
+              <div className="trade-card-shade" aria-hidden="true" />
+              <div className="trade-card-top"><span>{item.number}</span><span>ILLUSTRATIVE</span></div>
+              <div className="trade-card-content">
+                <p>{item.place}</p>
+                <h3>{item.title}</h3>
+                <span className="trade-card-detail">{item.description}</span>
+                {item.featured && <small>External 3PL facility — not owned or directly operated by PHARMA26.</small>}
+              </div>
             </motion.li>;
           })}
         </ol>
+        <p className="trade-photo-disclaimer">Illustrative photography — not PHARMA26 offices, facilities or operations.</p>
 
         <div className="trade-capabilities">
           <p className="trade-capabilities-label">THE PHARMA26 APPROACH</p>
