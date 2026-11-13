@@ -13,7 +13,8 @@ test('catalogue has the complete category counts and one record per brand', () =
 });
 test('all brands and all category filters display correct counts without duplicate Chanel',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/brands');await expect(page.getByRole('heading',{level:1})).toContainText('Our Brands');
+  await page.goto('/brands');await expect(page.getByRole('heading',{level:1})).toContainText('Brands & Products');
+  await expect(page.locator('.product-category-grid button')).toHaveCount(6);
   await expect(page.locator('.brand-card')).toHaveCount(75);await expect(page.locator('[data-brand-id="chanel"]')).toHaveCount(1);
   await expect(page.locator('.video-intro')).toHaveCount(0);
   for(const c of brandCategories){
@@ -44,11 +45,20 @@ test('desktop/mobile navigation, responsive layouts and reduced-motion rendering
   for(const width of [1440,1024,900,768,390,320]){
     await page.setViewportSize({width,height:900});await page.goto('/brands');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    if(width<900){await page.getByRole('button',{name:'Open menu'}).click();await page.locator('#mobile-navigation').getByRole('link',{name:'Our Brands'}).click();await expect(page.getByRole('button',{name:'Open menu'})).toHaveAttribute('aria-expanded','false');}
-    else await expect(page.locator('.desktop-links').getByRole('link',{name:'Our Brands'})).toBeVisible();
+    if(width<900){await page.getByRole('button',{name:'Open menu'}).click();await page.locator('#mobile-navigation').getByRole('link',{name:'Brands & Products'}).click();await expect(page.getByRole('button',{name:'Open menu'})).toHaveAttribute('aria-expanded','false');}
+    else await expect(page.locator('.desktop-links').getByRole('link',{name:'Brands & Products'})).toBeVisible();
   }
-  await page.getByRole('link',{name:'Contact our trading team'}).click();await expect(page).toHaveURL(/\/contact$/);
+  await page.getByRole('link',{name:'Request a Quote'}).click();await expect(page).toHaveURL(/\/contact$/);
   await expect(page.locator('form')).toHaveAttribute('action','https://formspree.io/f/xqegzjoz');
+});
+test('visual category cards filter the catalogue and the legacy products URL redirects',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/brands');
+  await page.locator('.product-category-grid [data-category="perfumes"]').click();
+  await expect(page).toHaveURL(/\/brands\?category=perfumes$/);
+  await expect(page.getByRole('button',{name:/^Perfumes /})).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.brand-card')).toHaveCount(4);
+  await page.goto('/products');await expect(page).toHaveURL(/\/brands$/);
+  await expect(page.getByRole('heading',{level:1})).toContainText('Brands & Products');
 });
 test('homepage showcase links to the catalogue and carries the sourcing disclaimer',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
