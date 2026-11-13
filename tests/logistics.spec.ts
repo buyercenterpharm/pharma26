@@ -34,3 +34,30 @@ test('site copy no longer claims warehouses in Paris or Cyprus', async ({ page }
     await expect(page.locator('body')).not.toContainText('our Belgian distribution center');
   }
 });
+
+test('homepage operating model is concise, accurate and scannable', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const section = page.locator('#company-introduction');
+  await expect(section.getByRole('heading', { name: /Strategic sourcing/ })).toBeVisible();
+  await expect(section.getByText('Headquartered in Cyprus, PHARMA26 LTD operates with Belgium-based warehousing through a trusted third-party logistics provider.')).toBeVisible();
+  await expect(section.getByText('Our merchandise is stored in Belgium, supporting efficient European and international B2B logistics.')).toBeVisible();
+  await expect(section.locator('.trade-flow-card')).toHaveCount(3);
+  await expect(section.getByRole('heading', { name: 'Headquarters' })).toBeVisible();
+  await expect(section.getByRole('heading', { name: 'Warehousing & Logistics' })).toBeVisible();
+  await expect(section.getByRole('heading', { name: 'B2B Distribution', exact: true })).toBeVisible();
+  await expect(section.getByText('External 3PL facility — not owned or directly operated by PHARMA26.')).toBeVisible();
+  await expect(section.locator('.trade-capabilities li')).toHaveCount(3);
+  await section.getByRole('link', { name: 'Explore our process' }).click();
+  await expect(page).toHaveURL(/\/how-it-works$/);
+});
+
+test('homepage operating model is responsive without horizontal overflow', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    await expect(page.locator('#company-introduction')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});

@@ -1,0 +1,36 @@
+.trade-foundation { padding:92px 0 72px; background:#fff; color:#0a192f; scroll-margin-top:80px; }
+.trade-foundation-container { width:90%; max-width:1320px; margin-inline:auto; }
+.trade-foundation-heading { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(320px,.55fr); gap:9%; align-items:end; }
+.trade-kicker { display:flex; align-items:center; gap:12px; color:#80663b; font-size:10px; letter-spacing:.2em; }
+.trade-kicker>span { display:block; width:28px; height:1px; background:#c6a66a; }
+.trade-foundation-heading h2 { font:400 clamp(40px,5vw,68px)/1.03 Georgia,serif; letter-spacing:-.05em; margin-top:22px; }
+.trade-foundation-heading h2 em { color:#80663b; font-weight:400; }
+.trade-intro { padding-bottom:6px; }
+.trade-intro>p { color:#53606d; font-size:14px; line-height:1.85; }
+.trade-intro>a { display:flex; align-items:center; gap:21px; width:fit-content; border-bottom:1px solid #947436; padding:12px 0; margin-top:24px; font-size:11px; }
+.trade-intro>a svg { transition:transform .25s; }.trade-intro>a:hover svg { transform:translateX(4px); }
+.trade-flow { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); list-style:none; padding:0; margin-top:58px; border-top:1px solid #0a192f25; border-left:1px solid #0a192f25; }
+.trade-flow-card { min-height:340px; padding:28px; border-right:1px solid #0a192f25; border-bottom:1px solid #0a192f25; display:flex; flex-direction:column; position:relative; background:#f9f8f5; transition:transform .3s,box-shadow .3s,background .3s; }
+.trade-flow-card:hover { transform:translateY(-6px); box-shadow:0 18px 35px #0a192f0d; background:#fff; z-index:2; }
+.trade-flow-featured { background:#0a192f; color:#f6f4f0; border-color:#0a192f; }
+.trade-flow-featured:hover { background:#12263d; }
+.trade-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:auto; }
+.trade-card-top>span { color:#967a49; font:400 12px/1 Georgia,serif; }
+.trade-card-top svg { color:#a68343; }
+.trade-flow-card>p { color:#80663b; font-size:9px; letter-spacing:.2em; margin-top:45px; }
+.trade-flow-featured>p { color:#d5b77f; }
+.trade-flow-card h3 { font:400 clamp(25px,2.2vw,32px)/1.15 Georgia,serif; letter-spacing:-.035em; margin-top:13px; }
+.trade-card-detail { max-width:310px; color:#5d6873; font-size:12px; line-height:1.75; margin-top:16px; }
+.trade-flow-featured .trade-card-detail { color:#ced5dd; }
+.trade-flow-card small { max-width:320px; padding-top:14px; margin-top:18px; border-top:1px solid #c6a66a55; color:#aeb9c5; font-size:9px; line-height:1.65; }
+.trade-capabilities { display:grid; grid-template-columns:220px 1fr; gap:40px; align-items:center; padding:28px 0; border-bottom:1px solid #0a192f20; }
+.trade-capabilities-label { color:#80663b; font-size:9px; letter-spacing:.18em; }
+.trade-capabilities ul { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; list-style:none; padding:0; }
+.trade-capabilities li { display:flex; align-items:center; gap:14px; }
+.trade-capabilities svg { color:#947436; flex:none; }
+.trade-capabilities h3 { font:400 15px/1.3 Georgia,serif; }.trade-capabilities li p { color:#69727b; font-size:10px; margin-top:4px; }
+.trade-logistics-note { margin:22px 0 0 auto; max-width:620px; color:#5d6873; font-size:10px; line-height:1.75; text-align:right; }
+@media(max-width:900px) { .trade-foundation-heading { grid-template-columns:1fr; gap:30px; }.trade-intro { max-width:620px; }.trade-flow-card { min-height:320px; padding:24px; }.trade-capabilities { grid-template-columns:1fr; gap:18px; } }
+@media(max-width:700px) { .trade-foundation { padding:62px 0 52px; }.trade-foundation-heading h2 { font-size:44px; }.trade-flow { grid-template-columns:1fr; margin-top:42px; }.trade-flow-card { min-height:260px; }.trade-flow-card:hover { transform:none; }.trade-flow-card>p { margin-top:30px; }.trade-capabilities ul { grid-template-columns:1fr; gap:19px; }.trade-capabilities li { border-top:1px solid #0a192f18; padding-top:18px; }.trade-logistics-note { text-align:left; }.trade-kicker { font-size:9px; letter-spacing:.15em; } }
+@media(max-width:370px) { .trade-foundation-heading h2 { font-size:38px; }.trade-flow-card { padding:21px; } }
+@media(prefers-reduced-motion:reduce) { .trade-flow-card,.trade-intro>a svg { transition:none; }.trade-flow-card:hover { transform:none; } }
