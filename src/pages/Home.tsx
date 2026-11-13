@@ -15,7 +15,7 @@ export default function Home() {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">A Trusted Partner in Global Wholesale</h2>
               <p className="text-brand-blue/70 leading-relaxed mb-6">
-                With strategic warehouses in Paris and Cyprus, PHARMA26 LTD operates at the intersection of global supply chains. We specialize in the sourcing and distribution of high-demand cosmetic and skincare products, serving a network of pharmacies, wholesalers, and professional distributors worldwide.
+                Headquartered in Cyprus, PHARMA26 LTD benefits from warehousing facilities in Belgium through a trusted third-party logistics provider. We specialize in the sourcing and B2B distribution of cosmetic and skincare products.
               </p>
               <p className="text-brand-blue/70 leading-relaxed">
                 Our business model is built on reliability, transparency, and a deep understanding of international logistics. We ensure that every product we distribute meets the highest standards of quality and regulatory compliance.

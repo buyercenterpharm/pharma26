@@ -24,7 +24,7 @@ export default function About() {
             <div>
               <h2 className="text-sm font-bold uppercase tracking-widest text-brand-accent mb-4">Our Foundation</h2>
               <p className="text-brand-blue/70 leading-relaxed">
-                PHARMA26 LTD was established with a clear mission: to streamline the international distribution of high-quality cosmetic products. Registered and headquartered in Cyprus, with strategic warehouses in both Paris and Cyprus, we leverage our unique position to facilitate seamless operations and serve clients across Europe, Asia, and the Middle East.
+                PHARMA26 LTD was established with a clear mission: to support the international B2B trade of high-quality cosmetic products. The company is registered and headquartered in Cyprus, while its merchandise is stored in Belgium at a facility operated by an external third-party logistics provider.
               </p>
             </div>
             <div>
@@ -42,7 +42,7 @@ export default function About() {
                 <span className="w-6 h-6 rounded-full bg-brand-accent flex-shrink-0 mr-4 mt-1"></span>
                 <div>
                   <h4 className="font-bold">Strategic Location</h4>
-                  <p className="text-sm text-white/60">We have warehouses in Paris and Cyprus, which facilitates all operations and ensures optimal access to international markets.</p>
+                  <p className="text-sm text-white/60">Our Cyprus headquarters works with a trusted third-party logistics provider for product storage in Belgium. PHARMA26 does not own or directly operate the facility.</p>
                 </div>
               </li>
               <li className="flex items-start">

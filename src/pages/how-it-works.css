@@ -1,0 +1,45 @@
+.process-page { padding-top:80px; color:#0a192f; background:#f6f4f0; }
+.process-container { width:90%; max-width:1320px; margin-inline:auto; }
+.process-eyebrow { display:flex; align-items:center; gap:12px; color:#80663b; font-size:10px; letter-spacing:.2em; line-height:1.8; }
+.process-eyebrow>span { width:28px; height:1px; background:#c6a66a; }
+.process-hero { padding:80px 0 72px; border-bottom:1px solid #0a192f1a; }
+.process-hero-copy { max-width:850px; }
+.process-hero h1 { font:400 clamp(58px,7vw,96px)/1.02 Georgia,serif; letter-spacing:-.055em; margin:22px 0 28px; }
+.process-hero h1 span { display:block; margin-top:17px; color:#80663b; font-size:.38em; font-style:italic; letter-spacing:-.025em; }
+.process-hero-copy>p:last-child { max-width:630px; color:#53606d; font-size:15px; line-height:1.85; }
+.belgium-logistics { padding:78px 0; background:#fff; }
+.logistics-grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr); gap:7%; align-items:center; }
+.warehouse-visual { position:relative; min-width:0; margin:0; }
+.warehouse-visual::before { content:''; position:absolute; inset:18px -18px -18px 18px; border:1px solid #c6a66a55; z-index:0; }
+.warehouse-visual img { position:relative; z-index:1; display:block; width:100%; aspect-ratio:16/10; object-fit:cover; }
+.warehouse-visual figcaption { position:relative; z-index:1; margin-top:12px; color:#69717a; font-size:9px; line-height:1.7; }
+.belgium-marker { position:absolute; z-index:2; left:22px; bottom:42px; display:flex; align-items:center; gap:9px; padding:11px 13px; background:#0a192feb; color:#f6f4f0; font-size:9px; letter-spacing:.18em; }
+.logistics-copy h2 { font:400 clamp(38px,4.2vw,58px)/1.08 Georgia,serif; letter-spacing:-.045em; margin:18px 0 27px; }
+.logistics-copy h2 em { color:#80663b; font-weight:400; }
+.logistics-copy>p:not(.process-eyebrow):not(.ownership-note) { color:#53606d; font-size:14px; line-height:1.85; margin-top:14px; }
+.logistics-facts { margin-top:28px; border-top:1px solid #0a192f20; }
+.logistics-facts>div { display:grid; grid-template-columns:130px 1fr; gap:18px; padding:16px 0; border-bottom:1px solid #0a192f20; }
+.logistics-facts dt { color:#69717a; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+.logistics-facts dd { display:flex; align-items:center; gap:10px; color:#0a192f; font-size:12px; }
+.logistics-facts dd svg { color:#947436; flex:none; }
+.ownership-note { margin-top:21px; padding-left:15px; border-left:2px solid #c6a66a; color:#5c6670; font-size:10px; line-height:1.8; }
+.process-steps { padding:74px 0 82px; }
+.steps-heading { max-width:620px; margin-bottom:38px; }
+.steps-heading h2 { font:400 clamp(33px,3.4vw,46px)/1.15 Georgia,serif; letter-spacing:-.04em; margin-top:12px; }
+.process-steps ol { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); list-style:none; padding:0; border-top:1px solid #0a192f25; border-left:1px solid #0a192f25; }
+.process-steps li { min-height:330px; padding:28px; border-right:1px solid #0a192f25; border-bottom:1px solid #0a192f25; display:flex; flex-direction:column; align-items:flex-start; }
+.step-number { color:#967a49; font:400 13px/1 Georgia,serif; margin-bottom:55px; }
+.process-steps li>svg { color:#947436; margin-bottom:24px; }
+.process-steps h3 { font:400 25px/1.25 Georgia,serif; letter-spacing:-.025em; }
+.process-steps li>p { color:#5e6974; font-size:12px; line-height:1.8; margin-top:18px; }
+.process-cta { padding:68px 0; background:#0a192f; color:#f6f4f0; }
+.process-cta-inner { display:flex; justify-content:space-between; align-items:center; gap:55px; }
+.process-cta .process-eyebrow { color:#c6a66a; }
+.process-cta h2 { font:400 clamp(34px,4vw,52px)/1.1 Georgia,serif; letter-spacing:-.04em; margin-top:17px; }
+.process-cta h2 em { color:#d0b47f; }
+.process-cta a { display:flex; align-items:center; justify-content:space-between; gap:35px; padding:18px 22px; border:1px solid #c6a66a; font-size:12px; transition:background .2s,color .2s; }
+.process-cta a:hover { background:#c6a66a; color:#0a192f; }
+@media(max-width:950px) { .logistics-grid { grid-template-columns:1fr; gap:52px; }.logistics-copy { max-width:720px; }.process-steps li { padding:24px; }.step-number { margin-bottom:40px; } }
+@media(max-width:700px) { .process-hero { padding:48px 0; }.process-hero h1 { font-size:61px; }.belgium-logistics { padding:52px 0; }.warehouse-visual::before { inset:10px -10px -10px 10px; }.belgium-marker { left:12px; bottom:42px; }.logistics-copy h2 { font-size:42px; }.logistics-facts>div { grid-template-columns:110px 1fr; }.process-steps { padding:55px 0; }.process-steps ol { grid-template-columns:1fr; }.process-steps li { min-height:265px; }.step-number { margin-bottom:28px; }.process-cta-inner { display:block; }.process-cta a { width:fit-content; margin-top:30px; }.process-cta { padding:52px 0; } }
+@media(max-width:380px) { .process-hero h1 { font-size:51px; }.logistics-copy h2 { font-size:36px; }.logistics-facts>div { grid-template-columns:1fr; gap:8px; }.process-cta a { gap:18px; padding:16px; } }
+@media(prefers-reduced-motion:reduce) { .process-cta a { transition:none; } }
