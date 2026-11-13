@@ -1,83 +1,71 @@
-import { motion } from 'motion/react';
-import { Search, Warehouse, Truck } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { ArrowUpRight, Building2, MapPin, Search, Warehouse } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import './how-it-works.css';
+
+const steps = [
+  { step: '01', title: 'Sourcing Requirements', icon: Search, desc: 'Our trading team reviews each B2B request and discusses the relevant brands, products, quantities and current sourcing conditions with the client.' },
+  { step: '02', title: 'Belgium-Based Storage', icon: Warehouse, desc: 'Products are stored in Belgium at a facility operated by an external third-party logistics provider. PHARMA26 coordinates inventory and logistics requirements without owning or directly operating the warehouse.' },
+  { step: '03', title: 'B2B Logistics Coordination', icon: ArrowUpRight, desc: 'Following commercial confirmation, PHARMA26 coordinates the next logistics steps with the relevant parties in accordance with the agreed transaction requirements.' },
+];
 
 export default function HowItWorks() {
-  const steps = [
-    {
-      step: "01",
-      title: "Sourcing Products",
-      icon: <Search size={48} />,
-      desc: "Our trading team identifies and sources high-demand cosmetic and skincare products from a network of approved international suppliers and manufacturers. We ensure all products meet our strict quality and regulatory standards."
-    },
-    {
-      step: "02",
-      title: "Storage & Logistics",
-      icon: <Warehouse size={48} />,
-      desc: "Sourced goods are securely stored in our strategic warehouse locations or transit hubs. We manage the inventory with precision, ensuring that products are ready for collection or onward shipping according to client requirements."
-    },
-    {
-      step: "03",
-      title: "Client Collection or Shipping",
-      icon: <Truck size={48} />,
-      desc: "Once the transaction is finalized, goods are made available for collection by the client's logistics partners or shipped via our trusted freight network. We provide all necessary documentation for international transit and customs."
-    }
-  ];
-
+  const reduced = useReducedMotion();
   return (
-    <div className="pt-20">
-      <section className="bg-brand-grey py-24 px-6 md:px-12 lg:px-24">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl"
-          >
-            <h1 className="text-4xl md:text-6xl font-bold text-brand-blue mb-8">Our Process</h1>
-            <p className="text-xl text-brand-blue/70 leading-relaxed">
-              A clear, professional approach to international trading and distribution.
-            </p>
+    <div className="process-page">
+      <section className="process-hero">
+        <div className="process-container">
+          <motion.div initial={reduced ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65 }} className="process-hero-copy">
+            <p className="process-eyebrow"><span /> FROM SOURCING TO LOGISTICS</p>
+            <h1>Our Process<span>A clear path through international B2B trade.</span></h1>
+            <p>PHARMA26 combines a Cyprus headquarters with Belgium-based warehousing through an external logistics provider.</p>
           </motion.div>
         </div>
       </section>
 
-      <section className="section-padding bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 gap-24">
-            {steps.map((item, idx) => (
-              <div key={idx} className={`flex flex-col lg:flex-row items-center gap-16 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="flex-1">
-                  <div className="text-6xl font-black text-brand-grey mb-6">{item.step}</div>
-                  <h2 className="text-3xl font-bold mb-6">{item.title}</h2>
-                  <p className="text-lg text-brand-blue/70 leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-                <div className="flex-1 w-full flex justify-center">
-                  <div className="w-full max-w-md aspect-square bg-brand-grey flex items-center justify-center text-brand-blue/20">
-                    <div className="transform scale-[2] opacity-50">
-                      {item.icon}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <section className="belgium-logistics" aria-labelledby="belgium-logistics-heading">
+        <div className="process-container logistics-grid">
+          <motion.figure initial={reduced ? false : { opacity: 0, x: -18 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: .25 }} transition={{ duration: .7 }} className="warehouse-visual">
+            <img src="/images/belgium-3pl-warehouse.webp" alt="Illustrative interior of a modern third-party logistics warehouse with pallet racking and unbranded cartons" width="1586" height="992" loading="eager" decoding="async" />
+            <figcaption>Illustrative logistics image — not a photograph of the specific facility.</figcaption>
+            <div className="belgium-marker" aria-hidden="true"><MapPin size={16} /> BELGIUM</div>
+          </motion.figure>
+          <motion.div initial={reduced ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .25 }} transition={{ duration: .65 }} className="logistics-copy">
+            <p className="process-eyebrow">WAREHOUSING & LOGISTICS</p>
+            <h2 id="belgium-logistics-heading">Headquartered in Cyprus.<br /><em>Stored in Belgium.</em></h2>
+            <p>Headquartered in Cyprus, PHARMA26 LTD benefits from warehousing facilities in Belgium through a trusted third-party logistics provider.</p>
+            <p>Our products are stored in Belgium, allowing us to coordinate European and international B2B shipments efficiently.</p>
+            <dl className="logistics-facts">
+              <div><dt>Corporate base</dt><dd><Building2 size={17} aria-hidden="true" /> Cyprus</dd></div>
+              <div><dt>Product storage</dt><dd><MapPin size={17} aria-hidden="true" /> Belgium</dd></div>
+              <div><dt>Facility operation</dt><dd><Warehouse size={17} aria-hidden="true" /> Third-party logistics provider</dd></div>
+            </dl>
+            <p className="ownership-note">The Belgium facility is operated by an external 3PL. PHARMA26 does not own or directly operate the warehouse.</p>
+          </motion.div>
         </div>
       </section>
 
-      <section className="py-24 bg-brand-blue text-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-8">Streamlined B2B Operations</h2>
-          <p className="max-w-2xl mx-auto text-white/60 leading-relaxed mb-12">
-            Our operational model is designed to minimize friction in the wholesale supply chain. By managing the complexities of sourcing and storage, we allow our partners to focus on their core business activities.
-          </p>
-          <div className="inline-flex items-center space-x-4 text-xs font-bold uppercase tracking-[0.3em]">
-            <span>Reliability</span>
-            <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
-            <span>Efficiency</span>
-            <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
-            <span>Scale</span>
-          </div>
+      <section className="process-steps" aria-labelledby="process-steps-heading">
+        <div className="process-container">
+          <div className="steps-heading"><p className="process-eyebrow">HOW WE WORK</p><h2 id="process-steps-heading">A considered B2B process.</h2></div>
+          <ol>
+            {steps.map((item, index) => {
+              const Icon = item.icon;
+              return <motion.li key={item.step} initial={reduced ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .2 }} transition={{ duration: .55, delay: reduced ? 0 : index * .08 }}>
+                <div className="step-number">{item.step}</div>
+                <Icon size={25} strokeWidth={1.4} aria-hidden="true" />
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </motion.li>;
+            })}
+          </ol>
+        </div>
+      </section>
+
+      <section className="process-cta">
+        <div className="process-container process-cta-inner">
+          <div><p className="process-eyebrow">START A CONVERSATION</p><h2>Discuss your sourcing<br /><em>requirements with us.</em></h2></div>
+          <Link to="/contact">Contact our trading team <ArrowUpRight size={19} /></Link>
         </div>
       </section>
     </div>

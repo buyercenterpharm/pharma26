@@ -1,0 +1,17 @@
+.video-intro { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:#080f19; color:#f6f4f0; visibility:hidden; pointer-events:none; opacity:0; overflow:hidden; }
+.video-intro.intro-visible { visibility:visible; pointer-events:auto; opacity:1; }
+.video-intro.intro-exiting { opacity:0; transition:opacity .55s ease; }
+/* Preserve every pixel of the source composition; no cropping/stretching on portrait screens. */
+.intro-film-frame { position:relative; width:min(100vw,177.777778vh); height:min(56.25vw,100vh); }
+.intro-film-frame video { display:block; width:100%; height:100%; object-fit:contain; }
+.intro-full-logo { position:absolute; top:50%; left:0; right:0; margin:auto; translate:0 -50%; width:30%; max-width:420px; height:auto; object-fit:contain; opacity:0; transform:scale(.96); transform-origin:center; box-shadow:0 0 40px #c6a66a20; border:1px solid #c6a66a50; }
+.intro-bottom { position:absolute; bottom:max(4%,env(safe-area-inset-bottom)); left:5%; right:5%; display:flex; justify-content:space-between; align-items:center; gap:20px; font-size:9px; letter-spacing:.07em; color:#d6dce4; }
+.intro-bottom>span { background:#080f19b8; padding:8px 10px; }
+.intro-bottom button { display:flex; align-items:center; gap:24px; border:1px solid #c6a66a88; background:#0a192fe8; color:#f6f4f0; padding:13px 20px; font-size:12px; cursor:pointer; }
+.intro-bottom button:hover { background:#263d52; }
+.intro-bottom button:focus-visible { outline:2px solid #f6f4f0; outline-offset:4px; }
+.intro-fallback .intro-film-frame video { visibility:hidden; }
+.intro-fallback .intro-full-logo { width:min(420px,72vw); max-width:none; }
+#site-content[inert] *, #site-content[inert] *::before, #site-content[inert] *::after { animation-play-state:paused!important; }
+@media(max-width:767px) { .intro-full-logo { width:38%; }.intro-bottom { font-size:8px; }.intro-bottom button { white-space:nowrap; gap:12px; padding:12px 15px; } }
+@media(prefers-reduced-motion:reduce) { .global-intro { display:none!important; } }
