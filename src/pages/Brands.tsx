@@ -26,11 +26,6 @@ export default function Brands() {
           <p className="brands-introduction">An international perspective on beauty and healthcare. Explore the brands in our B2B trading catalogue, from dermocosmetics and prestige beauty to professional haircare and pharmacy.</p>
           <p className="brands-independent">Independent sourcing. A conversation built around your business.</p>
         </motion.div>
-        <aside className="catalogue-folio" aria-label="Catalogue overview">
-          <span className="folio-label">THE BRAND DIRECTORY</span>
-          <div className="folio-count">{brands.length}<span>distinct brands</span></div>
-          <div className="folio-foot"><span>0{brandCategories.length} categories</span><span>One trading conversation.</span></div>
-        </aside>
       </div>
     </section>
     <section className="brand-directory brands-container" aria-labelledby="directory-heading">
